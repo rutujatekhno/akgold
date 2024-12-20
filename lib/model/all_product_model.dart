@@ -23,6 +23,7 @@ class AllProductModule {
   List<DealProducts>? dealProducts;
   List<RestProducts>? restProducts;
   bool? isDeal;
+  int? dealPrice;
 
   AllProductModule({
     this.productId,
@@ -40,6 +41,7 @@ class AllProductModule {
     this.dealProducts,
     this.restProducts,
     this.isDeal,
+    this.dealPrice
   });
 
   AllProductModule.fromJson(Map<String, dynamic> json)
@@ -56,6 +58,7 @@ class AllProductModule {
     basePrice = json['base_price'];
     makingPrice = json['making_price'];
     priceScale = json['price_scale'];
+    dealPrice = json['dealPrice'];
 
     if (json['dealProducts'] != null) {
       dealProducts = <DealProducts>[];
@@ -89,6 +92,7 @@ class AllProductModule {
     data['dealProducts'] = dealProducts?.map((e) => e.toJson()).toList();
     data['restProducts'] = restProducts?.map((e) => e.toJson()).toList();
     data['isDeal'] = isDeal;
+    data['dealPrice'] = dealPrice;
     return data;
   }
 }

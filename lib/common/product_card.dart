@@ -91,7 +91,7 @@ class ProductCard extends StatelessWidget {
                     child: Row(
                       children: [
                     Text(
-                    "₹${productModule.basePrice ?? 0}",  // Ensure basePrice has a default value if it's null
+                    "₹${productModule.dealPrice ?? 0}",  // Ensure basePrice has a default value if it's null
                       style: GoogleFonts.alatsi(
                         fontWeight: FontWeight.w400,
                         fontSize: 14.sp,  // Customize the font size based on your requirements
@@ -168,6 +168,142 @@ class ProductCard extends StatelessWidget {
       },
     );
   }
+
+
+  @override
+  Widget build(BuildContext context) {
+    final OrderCheckoutController orderCheckoutController = Get.find();
+
+    return Stack(
+      alignment: FractionalOffset.center,
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: GestureDetector(
+            onTap: () {
+              show(context);
+            },
+            child: SizedBox(
+              height: 240,
+              width: 190,
+              child: Card(
+                elevation: 6,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 14.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.green),
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(3),
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.circle,
+                                size: 14,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 2.h,),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 120),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              productModule.name ?? "NA",
+                              style: GoogleFonts.alatsi(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                            SizedBox(height: 1.h),
+                            Text(
+                              "₹${productModule.basePrice}",
+                              style: GoogleFonts.alatsi(
+                                decoration: TextDecoration.lineThrough,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(
+                            "₹${productModule.dealPrice}",
+                            style: GoogleFonts.alatsi(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              orderCheckoutController.addProductToCart(productModule);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xffFFF4D0), // Button background color
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              elevation: 5,
+                            ),
+                            child: Text(
+                              'Add to Cart',
+                              style: GoogleFonts.alatsi(
+                                color: Colors.brown,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 30,
+          width: 133,
+          height: 133,
+          child: GestureDetector(
+            onTap: () {
+              show(context);
+            },
+            child: ClipOval(
+              child: Image.asset(
+                'assets/images/cake.png',
+                width: 27.w,
+                height: 27.w,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 // cartAdd(BuildContext context) {
 //     final CartController cartController = Get.put(CartController());
@@ -421,127 +557,3 @@ class ProductCard extends StatelessWidget {
 //       },
 //     );
 //   }
-
-  @override
-  Widget build(BuildContext context) {
-    final OrderCheckoutController orderCheckoutController = Get.find();
-
-    return Stack(
-      alignment: FractionalOffset.center,
-      clipBehavior: Clip.none,
-      children: <Widget>[
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: GestureDetector(
-            onTap: () {
-              show(context);
-            },
-            child: SizedBox(
-              height: 240,
-              width: 174,
-              child: Card(
-                elevation: 6,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 14.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.green),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(3),
-                                ),
-                              ),
-                              child: const Icon(
-                                Icons.circle,
-                                size: 14,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Row(
-                          children: [
-                            // Display name of the first product in the dealProducts list
-                            Text(
-                              productModule.name ?? "NA",
-                              style: GoogleFonts.alatsi(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14.sp,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(
-                            "₹${productModule.basePrice}",  // Ensure basePrice has a default value if it's null
-                            style: GoogleFonts.alatsi(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14.sp,  // Customize the font size based on your requirements
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              orderCheckoutController.addProductToCart(productModule);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xffFFF4D0), // Button background color
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              elevation: 5,
-                            ),
-                            child: Text(
-                              'Add to Cart',
-                              style: GoogleFonts.alatsi(
-                                color: Colors.brown,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 30,
-          width: 133,
-          height: 133,
-          child: GestureDetector(
-            onTap: () {
-              show(context);
-            },
-            child: ClipOval(
-              child: Image.asset(
-                'assets/images/cake.png',
-                width: 27.w,
-                height: 27.w,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}

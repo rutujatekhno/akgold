@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../routes/app_pages.dart';
 import '../service/api.dart';
 import 'allcafename_controller.dart';
 
@@ -70,45 +71,34 @@ class AuthController extends GetxController {
         if (responseData['token'] != null) {
           final token = responseData['token'];
 
-          try {
-            // Decode token to extract user details
-            Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-            String cafeId = decodedToken['cafe_id'].toString();
+          // Decode the token to extract the cafeId
+          Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+          String cafeId = decodedToken['cafe_id'].toString();
 
-            // Save token and cafeId in SharedPreferences
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.setString('token', token);
-            await prefs.setString('cafe_id', cafeId);
+          // Save token, cafeId, and login status in SharedPreferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+          await prefs.setString('cafe_id', cafeId);  // Save the cafeId
+          await prefs.setBool('isLoggedIn', true);   // Mark as logged in
 
-            print('Decoded token: $decodedToken');
+          // Show success snackbar before navigation
+          Get.snackbar(
+            'Success',
+            'Login successful!',
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            duration: Duration(milliseconds: 1500),
+          );
 
-            // Show success snackbar before navigation
-            Get.snackbar(
-              'Success',
-              'Login successful!',
-              snackPosition: SnackPosition.TOP,
-              backgroundColor: Colors.green,
-              colorText: Colors.white,
-              duration: Duration(milliseconds: 1500)
-            );
+          // Delay slightly to ensure snackbar is visible
+          await Future.delayed(Duration(milliseconds: 500));
 
-            // Delay slightly to ensure snackbar is visible
-            await Future.delayed(Duration(milliseconds: 500));
+          // Navigate to the bottom screen (home screen)
+          await Get.toNamed(AppPages.BOTTOM_SCREEN);
 
-            // Navigate to the bottom screen
-            await Get.toNamed('/bottom_screen');
-
-            // Fetch cafes after successful navigation
-            await Get.find<CafeController>().fetchCafes(cafeId: int.parse(cafeId));
-          } catch (e) {
-            Get.snackbar(
-              'Error',
-              'Failed to decode token or save preferences.',
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.red,
-              colorText: Colors.white,
-            );
-          }
+          // Fetch cafes or other necessary data after login
+          await Get.find<CafeController>().fetchCafes(cafeId: int.parse(cafeId));
         } else {
           Get.snackbar(
             'Error',

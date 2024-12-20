@@ -8,6 +8,7 @@ class OrderController extends GetxController {
   var cafeName = ''.obs;
   var paymentTerm = ''.obs;
   var selectedDate = ''.obs;
+  var  routeId = ''.obs;
 
   var products = <Products>[].obs;
 
@@ -18,7 +19,7 @@ class OrderController extends GetxController {
   CreateCafeOrderModel createOrderModel() {
     return CreateCafeOrderModel(
       // cafeId: 5,
-      // routeId: 25,
+      routeId: 25,
       orderNumber: orderNumber.value,
       orderDate: selectedDate.value,
       // totalAmount: 4200,

@@ -29,32 +29,32 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: 5.h,
-              // width: double.infinity,
-              color: const Color(0xffD7BB9E),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on_sharp,
-                      color: Colors.white,
-                    ),
-                    SizedBox(
-                      width: 3.w,
-                    ),
-                    Text(
-                      "AK Golden Crust",
-                      style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // Container(
+            //   height: 5.h,
+            //   // width: double.infinity,
+            //   color: const Color(0xffD7BB9E),
+            //   child: Padding(
+            //     padding: const EdgeInsets.all(10.0),
+            //     child: Row(
+            //       children: [
+            //         const Icon(
+            //           Icons.location_on_sharp,
+            //           color: Colors.white,
+            //         ),
+            //         SizedBox(
+            //           width: 3.w,
+            //         ),
+            //         Text(
+            //           "AK Golden Crust",
+            //           style: GoogleFonts.poppins(
+            //               color: Colors.white,
+            //               fontWeight: FontWeight.w400,
+            //               fontSize: 14),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             // SizedBox(height: 15.h,),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -343,29 +343,29 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 5.h,),
-                  SizedBox(
-                    width: 90.w,
-                    height: 6.h,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                        const Color(0xff7B3F00),
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                          BorderRadius.circular(3),
-                        ),
-                      ),
-                      child: Text(
-                        "Complete Profile",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          fontSize: 16.sp,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: 90.w,
+                  //   height: 6.h,
+                  //   child: ElevatedButton(
+                  //     onPressed: () {},
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor:
+                  //       const Color(0xff7B3F00),
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius:
+                  //         BorderRadius.circular(3),
+                  //       ),
+                  //     ),
+                  //     child: Text(
+                  //       "Complete Profile",
+                  //       style: GoogleFonts.poppins(
+                  //         fontWeight: FontWeight.w600,
+                  //         color: Colors.white,
+                  //         fontSize: 16.sp,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

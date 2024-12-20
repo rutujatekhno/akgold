@@ -25,3 +25,9 @@ class BottomNavigationBinding extends Bindings {
   }
 }
 
+class RepeatOrderBinding extends Bindings{
+  @override
+  void dependencies (){
+    Get.lazyPut<OrderCheckoutController>(() => OrderCheckoutController());
+  }
+}

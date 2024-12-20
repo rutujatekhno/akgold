@@ -18,6 +18,9 @@ class OrderHistoryController extends GetxController {
   late final DateTime firstDayOfMonth;
   late final int totalDaysInMonth;
 
+  var pendingOrders = <Orders>[].obs;
+  var totalPendingAmount = 0.0.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -62,6 +65,8 @@ class OrderHistoryController extends GetxController {
 
           // Filter orders based on the selected date
           filterOrdersByDate();
+          updateTotalPendingAmount(); // Call here after fetching and filtering
+
         } else {
           errorMessage.value = "No orders found in the API response.";
         }
@@ -87,6 +92,8 @@ class OrderHistoryController extends GetxController {
     if (selectedIndex.value < 0) {
       // If no valid date is selected, show all orders
       _filteredOrders.value = orders;
+      updateTotalPendingAmount(); // Call here after filtering
+
       return;
     }
 
@@ -117,6 +124,12 @@ class OrderHistoryController extends GetxController {
     });
   }
 
+
+
+  void resetFilter() {
+    filteredOrders.assignAll(orders); // Reset to original list
+  }
+
   // Reset the date filter and show all orders
   void resetDateFilter() {
     selectedIndex.value = -1; // Reset the selected date index
@@ -143,7 +156,21 @@ class OrderHistoryController extends GetxController {
           : DateTime.fromMillisecondsSinceEpoch(0);
       return dateB.compareTo(dateA); // Descending order
     });
+    updateTotalPendingAmount(); // Call here after filtering
+
   }
   // Get the filtered orders for display
   List<Orders> get filteredOrders => _filteredOrders.toList();
+
+
+  void updateTotalPendingAmount() {
+    totalPendingAmount.value = orders.where((order) => order.paymentStatus == 0).map((order) => order.totalAmount).fold(0.0, (a, b) => a + b!);
+  }
+
+  void addOrder(Orders newOrder) {
+    orders.add(newOrder);
+    updateTotalPendingAmount();
+    update(); // or refresh() to trigger UI update
+  }
+
 }

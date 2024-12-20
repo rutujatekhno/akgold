@@ -52,7 +52,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         Map<String, dynamic> data = json.decode(response.body);
-
+print(response.body);
         // Parse dealProducts and restProducts
         List<AllProductModule> dealProducts = (data['dealProducts'] ?? [])
             .map<AllProductModule>((json) => AllProductModule.fromJson(json))
@@ -62,26 +62,31 @@ class ApiService {
             .map<AllProductModule>((json) => AllProductModule.fromJson(json))
             .toList();
 
-        // Combine into allProducts
+        // Combine into allProducts (optional: handle sorting or categorization here)
         List<AllProductModule> allProducts = [...dealProducts, ...restProducts];
 
-
+        // Set the products for order checkout
         final OrderCheckoutController orderCheckoutController = Get.find();
-        orderCheckoutController.products.value = allProducts;
+        orderCheckoutController.dealProducts.value = dealProducts;
+        orderCheckoutController.restProducts.value = restProducts;
         orderCheckoutController.isLoading.value = false;
-        // Print allProducts to the console
-        print('All Products: $allProducts');
-        for (var product in allProducts) {
-          print(product.toJson()); // or print specific properties like product.name, product.basePrice, etc.
-        }
-        print('Deal Products: $dealProducts');
-        for (var product in dealProducts) {
-          print(product.toJson());
-        }
-        print('Rest Products: $restProducts');
-        for (var product in restProducts) {
-          print(product.toJson());
-        }
+
+        // Debugging: Print out the results
+        // print('All Products: $allProducts');
+        // for (var product in allProducts) {
+        //   print(product.toJson()); // Print individual product details
+        // }
+        print("Dealllll${dealProducts.toList()}");
+
+        // Debugging: Print separate dealProducts and restProducts
+        // print('Deal Products: $dealProducts');
+        // for (var product in dealProducts) {
+        //   print(product.toJson());
+        // }
+        // print('Rest Products: $restProducts');
+        // for (var product in restProducts) {
+        //   print(product.toJson());
+        // }
 
         return ProductData(allProducts: allProducts);
       } else {

@@ -23,8 +23,10 @@ import '../screens/splash_screen.dart';
 
 
 class AppPages {
-  static const INITIAL_ROUTE = '/splash';
-
+  static const INITIAL_ROUTE = '/splash'; // Default initial route
+  static const SPLASH = '/splash';
+  static const BOTTOM_SCREEN = '/bottom_screen';
+  static const LOGIN_SCREEN = '/login';
   static final routes = [
     GetPage(
       name: '/splash',
@@ -72,6 +74,7 @@ class AppPages {
     GetPage(
       name: '/dashboard_screen',
       page: () =>  DashboardScreen(),
+      binding: RepeatOrderBinding(),
     ),
     // GetPage(name: '/neworder',
     //     page: () => NewOrderForm()

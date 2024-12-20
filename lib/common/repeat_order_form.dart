@@ -12,6 +12,7 @@ import '../model/cafe_orderall_model.dart';
 class RepeatOrder extends StatelessWidget {
   final RepeatOrderController controller = Get.put(RepeatOrderController());
   final DateController dateController = Get.put(DateController());
+  final OrderCheckoutController orderCheckoutController = Get.put(OrderCheckoutController()); // Initialize here
 
   RepeatOrder({super.key});
 
@@ -106,6 +107,7 @@ class RepeatOrder extends StatelessWidget {
                   if (controller.isLoading.value) {
                     return const Center(child: CircularProgressIndicator());
                   }
+
                   if (controller.errorMessage.isNotEmpty) {
                     return Center(child: Text(controller.errorMessage.value));
                   }
@@ -169,9 +171,7 @@ class RepeatOrder extends StatelessWidget {
                                   ),
                                   ElevatedButton(
                                     onPressed: () {
-                                      final orderCheckoutController =
-                                      Get.put(OrderCheckoutController());
-                                      orderCheckoutController.repeatOrder(order);
+                                      orderCheckoutController.repeatOrder(order);  // Now using the controller here directly
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: isSelected
@@ -209,11 +209,12 @@ class RepeatOrder extends StatelessWidget {
 
   void _showOrderDetailsPopup(BuildContext context, Orders order) {
     // Calculate total quantities and total amount
-    final int totalProducts = order.products?.fold(
-        0, (sum, product) => sum! + (product.quantity ?? 0)) ??
+    final int totalProducts = order.products
+        ?.fold<int>(0, (sum, product) => sum + (product.quantity ?? 0).toInt()) ??
         0; // Total quantity of all products
-    final double totalAmount = order.products?.fold(
-        0.0, (sum, product) => sum! + (product.subTotalAmount ?? 0.0)) ??
+
+    final double totalAmount = order.products?.fold<double>(
+        0.0, (sum, product) => sum + (product.subTotalAmount ?? 0.0).toDouble()) ??
         0.0; // Total amount
 
     showDialog(
@@ -261,7 +262,9 @@ class RepeatOrder extends StatelessWidget {
                               return GestureDetector(
                                 onTap: () {
                                   selectedIndex.value =
-                                  (selectedIndex.value == index) ? null : index;
+                                  (selectedIndex.value == index)
+                                      ? null
+                                      : index;
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
@@ -272,7 +275,8 @@ class RepeatOrder extends StatelessWidget {
                                   ),
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 6.0, horizontal: 8.0),
-                                  margin: const EdgeInsets.symmetric(vertical: 2.0),
+                                  margin:
+                                  const EdgeInsets.symmetric(vertical: 2.0),
                                   child: Row(
                                     mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -347,5 +351,4 @@ class RepeatOrder extends StatelessWidget {
       },
     );
   }
-
 }

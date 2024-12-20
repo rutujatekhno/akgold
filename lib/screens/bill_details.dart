@@ -112,8 +112,8 @@ class _BillDetailsState extends State<BillDetails> {
                           // Get.toNamed('/ordercheckout_screen');
                           // Get.back();
                           // Get.find<PersistentTabController>().jumpToTab(1); // Assuming BillDetails is at index 3
-                          PersistentNavBarNavigator.pushNewScreen(context, screen: OrderCheckoutScreen(),withNavBar: true);
-
+                          PersistentNavBarNavigator.pushNewScreen(context,
+                              screen: OrderCheckoutScreen(), withNavBar: true);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xff7B3F00),
@@ -140,7 +140,6 @@ class _BillDetailsState extends State<BillDetails> {
             )));
   }
 
-
   Widget _buildAddressSection() {
     final CafeController cafeController = Get.find();
 
@@ -163,10 +162,11 @@ class _BillDetailsState extends State<BillDetails> {
                       fontSize: 14,
                     ),
                   ),
-                  Obx(() => Text( // Use Obx to update when cafeAddress changes
-                    "  ${cafeController.cafeAddress.value}",
-                    style: GoogleFonts.inter(fontWeight: FontWeight.w500),
-                  )),
+                  Obx(() => Text(
+                        // Use Obx to update when cafeAddress changes
+                        "  ${cafeController.cafeAddress.value}",
+                        style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+                      )),
                 ],
               ),
             ],
@@ -322,14 +322,11 @@ class _BillDetailsState extends State<BillDetails> {
                   // Check if there are selected products
                   if (orderCheckoutController.selectedProducts.isEmpty) {
                     // Show an error message if no products are selected
-                    Get.snackbar(
-                      "Error",
-                      "Please add products to your cart.",
-                      snackPosition: SnackPosition.TOP,
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
-                        duration: Duration(milliseconds: 1000)
-                    );
+                    Get.snackbar("Error", "Please add products to your cart.",
+                        snackPosition: SnackPosition.TOP,
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        duration: Duration(milliseconds: 1000));
                     return;
                   }
                   await orderCheckoutController.submitOrder();
@@ -527,11 +524,16 @@ class _BillDetailsState extends State<BillDetails> {
     final productId = product.productId ?? 0;
     final quantity = orderCheckoutController.cartItems[product.productId] ?? 0;
 
+    final priceToDisplay = product.dealPrice != null ? product.dealPrice : product.basePrice;
+
+    double displayedPrice = 0.0;
     return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-        child: Column(
-          children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -550,10 +552,9 @@ class _BillDetailsState extends State<BillDetails> {
                     ),
                   ),
                   Row(
-                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "[ $quantity Piece] ",
+                        "[ $quantity ${product.priceScale == 'Per Item' ? 'Piece' : 'kg'} ]",
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -572,99 +573,173 @@ class _BillDetailsState extends State<BillDetails> {
                       ),
                     ],
                   ),
-                  Text(
-                    outOfStock
-                        ? " Item is Out of Stock. Kindly Remove"
-                        : "In Stock",
-                    style: GoogleFonts.inter(
-                        color: outOfStock ? Colors.red : Colors.green,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w300),
+                  Row(
+                    children: [
+                      Text(
+                        // outOfStock
+                        //     ? " Item is Out of Stock. Kindly Remove"
+                        //     : "In Stock",
+                        "${product.priceScale == 'Per Item' ? 'Per Item' : 'Per Kg'} ",
+
+                        style: GoogleFonts.inter(
+                            color: Colors.grey,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        "₹${priceToDisplay ?? 0}",
+                        style: GoogleFonts.inter(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300),
+                      ),
+                    ],
                   ),
                   SizedBox(
                     width: 3.w,
                   ),
                 ],
               ),
-              Column(
-                children: [
-                  // Quantity control buttons
-                  Row(
-                    children: [
-                      Container(
-                        width: 120,
-                        height: 35,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.brown),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(
-                                Icons.remove,
-                                size: 16,
+              if (product.priceScale == 'Per Item')
+                Column(
+                  children: [
+                    // Quantity control buttons
+                    Row(
+                      children: [
+                        Container(
+                          width: 120,
+                          height: 35,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.brown),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.remove,
+                                  size: 16,
+                                ),
+                                onPressed: () {
+                                    orderCheckoutController
+                                        .decreaseProductQuantity(productId);
+                                },
+                                color:
+                                    quantity == 0 ? Colors.grey : Colors.brown,
                               ),
-                              onPressed: () {
-                                if (quantity > 0) {
-                                  orderCheckoutController
-                                      .decreaseProductQuantity(productId);
-                                }
-                              },
-                              color: quantity == 0 ? Colors.grey : Colors.brown,
-                            ),
-                            Text(
-                              "$quantity",
-                              style:
-                                  const TextStyle(color: Colors.brown, fontSize: 14),
-                            ),
-                            IconButton(
+                              Text(
+                                "$quantity",
+                                style: const TextStyle(
+                                    color: Colors.brown, fontSize: 14),
+                              ),
+                              IconButton(
                                 icon: const Icon(
                                   Icons.add,
                                   size: 16,
                                 ),
                                 onPressed: () {
-                                  if (!outOfStock) {
                                     orderCheckoutController
                                         .increaseProductQuantity(productId);
-                                  }
-                                },
-                                color: outOfStock ? Colors.grey : Colors.brown),
-                          ],
+                                    },
+                                color: outOfStock ? Colors.grey : Colors.brown,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 2.w,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.cancel, size: 24),
-                        onPressed: () {
-                          orderCheckoutController.removeAllProducts(productId);
-                        },
-                        color: Colors.grey,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 1.h,
-                  ),
-                  Text(
-                    "₹${(product.basePrice ?? 0) * quantity}",
-                    style: GoogleFonts.alatsi(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
+                        SizedBox(
+                          width: 2.w,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.cancel, size: 24),
+                          onPressed: () {
+                            orderCheckoutController
+                                .removeAllProducts(productId);
+                          },
+                          color: Colors.grey,
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            ]),
-            const Divider(
-              // Add Divider
-              color: Colors.grey,
-              thickness: 1,
-            ),
-          ],
-        ));
+                    SizedBox(
+                      height: 1.h,
+                    ),
+                    Text(
+                      "₹${(priceToDisplay ?? 0) * quantity}",
+                      style: GoogleFonts.alatsi(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              if (product.priceScale == 'Per kg')
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 120,
+                          height: 35,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.brown),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: TextField(
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            onChanged: (value) {
+                              orderCheckoutController.updateWeight(productId, value);
+                            },
+                            decoration: const InputDecoration(
+                              hintText: 'Enter',
+                              suffixText: 'KG',
+                              hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                            ),
+                            style: const TextStyle(color: Colors.brown, fontSize: 14),
+                          ),
+                        ),
+                        SizedBox(width: 2.w),
+                        IconButton(
+                          icon: const Icon(Icons.cancel, size: 24),
+                          onPressed: () {
+                            orderCheckoutController.removeAllProducts(productId);
+                          },
+                          color: Colors.grey,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 1.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "${orderCheckoutController.getDisplayWeight(productId)} KG",
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
+                        Text(
+                          "₹${orderCheckoutController.getPriceToDisplay(productId).toStringAsFixed(2)}",
+                          style: GoogleFonts.alatsi(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+            ],
+          ),
+          const Divider(
+            color: Colors.grey,
+            thickness: 1,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildBillRow(String label, String value, {bool isBold = false}) {
@@ -697,6 +772,11 @@ class _BillDetailsState extends State<BillDetails> {
 
 void cartAdd(BuildContext context, AllProductModule selectedProduct) {
   final OrderCheckoutController orderCheckoutController = Get.find();
+
+  // Calculate the price to display (dealPrice or basePrice)
+  final priceToDisplay = selectedProduct.dealPrice != null
+      ? selectedProduct.dealPrice
+      : selectedProduct.basePrice;
 
   showModalBottomSheet(
     context: context,
@@ -739,9 +819,9 @@ void cartAdd(BuildContext context, AllProductModule selectedProduct) {
                 child: Row(
                   children: [
                     Text(
-                      "₹${selectedProduct.basePrice}",
-                      style:
-                          const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      '₹ ${priceToDisplay! * (orderCheckoutController.cartItems[selectedProduct.productId] ?? 0)}',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                   ],
                 ),
@@ -839,8 +919,8 @@ void cartAdd(BuildContext context, AllProductModule selectedProduct) {
                             child: ElevatedButton(
                               onPressed: () {
                                 // Get.toNamed('/billdetails');
-                                Get.find<PersistentTabController>().jumpToTab(3);
-
+                                Get.find<PersistentTabController>()
+                                    .jumpToTab(3);
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.brown,

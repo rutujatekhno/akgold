@@ -111,11 +111,13 @@ class Orders {
 class Products {
   String? name;
   int? rate;
-  int? quantity;
+  double? quantity;
   int? productId;
   String? description;
   String? priceScale;
   int? subTotalAmount;
+  double? productBasePrice; // Change to double
+  double? productDealPrice; // Change to double
 
   Products(
       {this.name,
@@ -124,16 +126,23 @@ class Products {
         this.productId,
         this.description,
         this.priceScale,
-        this.subTotalAmount});
+        this.subTotalAmount,
+        this.productBasePrice,
+        this.productDealPrice,
+      });
 
   Products.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     rate = json['rate'];
-    quantity = json['quantity'];
+    quantity = (json['quantity'] as num).toDouble();
     productId = json['product_id'];
     description = json['description'];
     priceScale = json['price_scale'];
     subTotalAmount = json['sub_total_amount'];
+    productBasePrice = (json['productBasePrice'] as num?)?.toDouble(); // Safely convert
+    productDealPrice = (json['productDealPrice'] as num?)?.toDouble();
+
+
   }
 
   Map<String, dynamic> toJson() {
@@ -145,6 +154,9 @@ class Products {
     data['description'] = this.description;
     data['price_scale'] = this.priceScale;
     data['sub_total_amount'] = this.subTotalAmount;
+    data['productBasePrice'] = this.productBasePrice; // Include base price
+    data['productDealPrice'] = this.productDealPrice; // Include deal price
     return data;
   }
+
 }
