@@ -183,8 +183,7 @@ class OrderHistoryScreen extends StatelessWidget {
                     child: Container(
                       width: 35.w,
                       height: 5.h,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade100,
                         border: Border.all(color: Colors.grey.shade400),
@@ -204,30 +203,31 @@ class OrderHistoryScreen extends StatelessWidget {
                             ),
                           ),
                           Row(
-                            // Wrap calendar and reset icons in a Row
                             children: [
                               InkWell(
                                 onTap: () async {
                                   DateTime? pickedDate = await showDatePicker(
                                     context: context,
-                                    // initialDate: DateTime.now(),
                                     firstDate: DateTime(2000),
                                     lastDate: DateTime(2101),
+                                    initialEntryMode: DatePickerEntryMode.calendarOnly,
+                                    selectableDayPredicate: (DateTime date) {
+                                      // Disable selection for today's date
+                                      // return date != DateTime.now();
+                                      return true ;
+                                    },
                                   );
 
                                   if (pickedDate != null) {
                                     String formattedDate =
-                                        DateFormat('yyyy-MM-dd')
-                                            .format(pickedDate);
+                                    DateFormat('yyyy-MM-dd').format(pickedDate);
                                     dateController.setDate(formattedDate);
 
                                     // Calculate the new selectedIndex based on the pickedDate
                                     int newIndex = pickedDate
-                                        .difference(orderHistoryController
-                                            .firstDayOfMonth)
+                                        .difference(orderHistoryController.firstDayOfMonth)
                                         .inDays;
-                                    orderHistoryController
-                                        .updateSelectedIndex(newIndex);
+                                    orderHistoryController.updateSelectedIndex(newIndex);
                                   }
                                 },
                                 child: const Icon(
@@ -236,17 +236,14 @@ class OrderHistoryScreen extends StatelessWidget {
                                   size: 20,
                                 ),
                               ),
-                              if (dateController.selectedDate.value
-                                  .isNotEmpty) // Show reset icon only if a date is selected
+                              if (dateController.selectedDate.value.isNotEmpty)
                                 InkWell(
                                   onTap: () {
-                                    dateController
-                                        .setDate(''); // Reset the selected date
-                                    orderHistoryController.updateSelectedIndex(
-                                        -1); // Reset selectedIndex
+                                    dateController.setDate('');
+                                    orderHistoryController.updateSelectedIndex(-1);
                                   },
                                   child: const Icon(
-                                    Icons.clear, // Or any other suitable icon
+                                    Icons.clear,
                                     color: Colors.black54,
                                     size: 20,
                                   ),
@@ -539,63 +536,124 @@ class OrderHistoryScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          ...order.products!.asMap().entries.map(
-                                (entry) {
-                              int index = entry.key;
-                              var product = entry.value;
+                          // Per Item products
+                          ...order.products!
+                              .where((product) => product.priceScale == 'Per Item')
+                              .toList()
+                              .asMap()
+                              .entries
+                              .map((entry) {
+                            int index = entry.key;
+                            var product = entry.value;
 
-                              return GestureDetector(
-                                onTap: () {
-                                  selectedIndex.value =
-                                  (selectedIndex.value == index)
-                                      ? null
-                                      : index;
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: selected == index
-                                        ? const Color(0xffF5E1C0)
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 6.0, horizontal: 8.0),
-                                  margin:
-                                  const EdgeInsets.symmetric(vertical: 2.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "${product.name} [${product.quantity ?? 0} Piece]",
-                                            style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 13,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      // Price
-                                      Text(
-                                        "₹ ${product.subTotalAmount}",
-                                        style: GoogleFonts.inter(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 13,
-                                          color: const Color(0xff7B3F00),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                            return GestureDetector(
+                              onTap: () {
+                                selectedIndex.value =
+                                (selectedIndex.value == index) ? null : index;
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: selected == index
+                                      ? const Color(0xffF5E1C0)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
-                              );
-                            },
-                          ),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 6.0, horizontal: 8.0),
+                                margin: const EdgeInsets.symmetric(vertical: 2.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${product.name} [${product.quantity ?? 0} Piece]",
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 13,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // Price
+                                    Text(
+                                      "₹ ${product.subTotalAmount}",
+                                      style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                        color: const Color(0xff7B3F00),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }),
+
+                          // Per kg products
+                          ...order.products!
+                              .where((product) => product.priceScale == 'Per kg')
+                              .toList()
+                              .asMap()
+                              .entries
+                              .map((entry) {
+                            int index = entry.key;
+                            var product = entry.value;
+
+                            return GestureDetector(
+                              onTap: () {
+                                selectedIndex.value =
+                                (selectedIndex.value == index) ? null : index;
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: selected == index
+                                      ? const Color(0xffF5E1C0)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 6.0, horizontal: 8.0),
+                                margin: const EdgeInsets.symmetric(vertical: 2.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${product.name} [${product.quantity ?? 0} KG]",
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 13,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // Price
+                                    Text(
+                                      "₹ ${product.subTotalAmount}",
+                                      style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                        color: const Color(0xff7B3F00),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }),
+
                           const Padding(
                             padding: EdgeInsets.symmetric(vertical: 4.0),
                             child: Divider(
@@ -635,5 +693,4 @@ class OrderHistoryScreen extends StatelessWidget {
         );
       },
     );
-  }
-}
+  }}

@@ -16,6 +16,7 @@ class BillDetails extends StatefulWidget {
 }
 
 class _BillDetailsState extends State<BillDetails> {
+
   @override
   Widget build(BuildContext context) {
     final cafeController = Get.find<CafeController>();
@@ -76,12 +77,12 @@ class _BillDetailsState extends State<BillDetails> {
                         ),
                         Obx(() {
                           final cafeName = cafeController.cafes
-                                  .firstWhereOrNull(
-                                    (cafe) =>
-                                        cafe.cafeId ==
-                                        cafeController.selectedCafeId.value,
-                                  )
-                                  ?.cafeName ??
+                              .firstWhereOrNull(
+                                (cafe) =>
+                            cafe.cafeId ==
+                                cafeController.selectedCafeId.value,
+                          )
+                              ?.cafeName ??
                               'Unnamed Cafe';
 
                           return Text(
@@ -163,10 +164,10 @@ class _BillDetailsState extends State<BillDetails> {
                     ),
                   ),
                   Obx(() => Text(
-                        // Use Obx to update when cafeAddress changes
-                        "  ${cafeController.cafeAddress.value}",
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w500),
-                      )),
+                    // Use Obx to update when cafeAddress changes
+                    "  ${cafeController.cafeAddress.value}",
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+                  )),
                 ],
               ),
             ],
@@ -257,9 +258,9 @@ class _BillDetailsState extends State<BillDetails> {
               children: [
                 // Subtotal
                 Obx(() => _buildBillRow(
-                      "Subtotal",
-                      "₹${orderCheckoutController.totalPrice.value}",
-                    )),
+                  "Subtotal",
+                  "₹${orderCheckoutController.totalPrice.value}",
+                )),
                 _buildBillRow("GST", "₹ 0.00"),
                 // GST
                 // Obx(()
@@ -441,7 +442,7 @@ class _BillDetailsState extends State<BillDetails> {
           height: 1.h,
         ),
         Obx(
-          () => Visibility(
+              () => Visibility(
             visible: orderCheckoutController.showCancelButton.value,
             child: Center(
               child: SizedBox(
@@ -525,6 +526,7 @@ class _BillDetailsState extends State<BillDetails> {
     final quantity = orderCheckoutController.cartItems[product.productId] ?? 0;
 
     final priceToDisplay = product.dealPrice != null ? product.dealPrice : product.basePrice;
+    TextEditingController _controller = TextEditingController(text: quantity.toString());
 
     double displayedPrice = 0.0;
     return Padding(
@@ -553,13 +555,34 @@ class _BillDetailsState extends State<BillDetails> {
                   ),
                   Row(
                     children: [
-                      Text(
-                        "[ $quantity ${product.priceScale == 'Per Item' ? 'Piece' : 'kg'} ]",
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                      /*
+                      Obx(() {
+                        final weightInKg = orderCheckoutController.cartWeights[productId] ?? 0.0;
+                        final weightInPc = orderCheckoutController.cartItems[productId] ?? 0.0;
+
+
+                        // Check if the product is priced 'Per kg'
+                        if (product.priceScale == 'Per kg') {
+                          // Display the weight in kg for products priced by weight
+                          return Text(
+                            "[ ${weightInKg.toStringAsFixed(2)} KG ]",  // Display kg with two decimal places
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        } else {
+                          // For products priced by 'Piece', just display the quantity
+                          return Text(
+                            "[ ${weightInPc.toStringAsFixed(0)} Piece ]",  // Display quantity in Pieces (or leave it as is)
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        }
+                      }),
+                      */
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.all(Radius.zero),
@@ -593,7 +616,7 @@ class _BillDetailsState extends State<BillDetails> {
                             color: Colors.black,
                             fontSize: 14,
                             fontWeight: FontWeight.w300),
-                      ),
+                      )
                     ],
                   ),
                   SizedBox(
@@ -608,44 +631,48 @@ class _BillDetailsState extends State<BillDetails> {
                     Row(
                       children: [
                         Container(
-                          width: 120,
-                          height: 35,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.brown),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.remove,
-                                  size: 16,
-                                ),
-                                onPressed: () {
-                                    orderCheckoutController
-                                        .decreaseProductQuantity(productId);
-                                },
-                                color:
-                                    quantity == 0 ? Colors.grey : Colors.brown,
-                              ),
-                              Text(
-                                "$quantity",
-                                style: const TextStyle(
-                                    color: Colors.brown, fontSize: 14),
-                              ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.add,
-                                  size: 16,
-                                ),
-                                onPressed: () {
-                                    orderCheckoutController
-                                        .increaseProductQuantity(productId);
+                            width: 120,
+                            height: 35,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.brown),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Obx(() {
+                              final quantity = orderCheckoutController.cartItems[productId] ?? 0;
+
+                              return Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.remove,
+                                      size: 16,
+                                    ),
+                                    onPressed: () {
+                                      orderCheckoutController
+                                          .decreaseProductQuantity(productId);
                                     },
-                                color: outOfStock ? Colors.grey : Colors.brown,
-                              ),
-                            ],
-                          ),
+                                    color:
+                                    quantity == 0 ? Colors.grey : Colors.brown,
+                                  ),
+                                  Text(
+                                    "$quantity",
+                                    style: const TextStyle(
+                                        color: Colors.brown, fontSize: 14),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.add,
+                                      size: 16,
+                                    ),
+                                    onPressed: () {
+                                      orderCheckoutController
+                                          .increaseProductQuantity(productId);
+                                    },
+                                    color: outOfStock ? Colors.grey : Colors.brown,
+                                  ),
+                                ],
+                              );
+                            },)
                         ),
                         SizedBox(
                           width: 2.w,
@@ -672,6 +699,7 @@ class _BillDetailsState extends State<BillDetails> {
                     ),
                   ],
                 ),
+
               if (product.priceScale == 'Per kg')
                 Column(
                   children: [
@@ -684,20 +712,43 @@ class _BillDetailsState extends State<BillDetails> {
                             border: Border.all(color: Colors.brown),
                             borderRadius: BorderRadius.circular(8),
                           ),
+
+                          child: TextField(
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            onChanged: (value) {
+                              double weight = double.tryParse(value) ?? 0.0;  // Convert to double
+                              orderCheckoutController.updateWeight(productId, weight as String);
+                            },
+
+                            controller: _controller,
+                            decoration: InputDecoration(
+                              hintText: 'Enter',
+                              suffixText: 'KG',
+                              hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                            ),
+                            style: const TextStyle(color: Colors.brown, fontSize: 14),
+                          ),
+
+
+                          /*
                           child: TextField(
                             keyboardType: TextInputType.numberWithOptions(decimal: true),
                             onChanged: (value) {
                               orderCheckoutController.updateWeight(productId, value);
                             },
-                            decoration: const InputDecoration(
+                            controller: _controller,
+                            decoration: InputDecoration(
                               hintText: 'Enter',
                               suffixText: 'KG',
-                              hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
+                              hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                             ),
                             style: const TextStyle(color: Colors.brown, fontSize: 14),
                           ),
+                          */
                         ),
                         SizedBox(width: 2.w),
                         IconButton(
@@ -713,13 +764,23 @@ class _BillDetailsState extends State<BillDetails> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // Text(
+                        //   "${orderCheckoutController.getDisplayWeight(productId)} KG",
+                        //   style: const TextStyle(
+                        //     color: Colors.grey,
+                        //     fontSize: 12,
+                        //   ),
+                        // ),
+
                         Text(
-                          "${orderCheckoutController.getDisplayWeight(productId)} KG",
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
+                          "₹${priceToDisplay! * quantity}",  // Price based on current weight
+                          style: GoogleFonts.alatsi(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
+
+                        /*
                         Text(
                           "₹${orderCheckoutController.getPriceToDisplay(productId).toStringAsFixed(2)}",
                           style: GoogleFonts.alatsi(
@@ -727,10 +788,11 @@ class _BillDetailsState extends State<BillDetails> {
                             fontWeight: FontWeight.w400,
                           ),
                         ),
+                         */
                       ],
                     ),
                   ],
-                ),
+                )
             ],
           ),
           const Divider(
@@ -741,6 +803,7 @@ class _BillDetailsState extends State<BillDetails> {
       ),
     );
   }
+
 
   Widget _buildBillRow(String label, String value, {bool isBold = false}) {
     return Padding(
@@ -789,184 +852,184 @@ void cartAdd(BuildContext context, AllProductModule selectedProduct) {
             padding: const EdgeInsets.only(top: 6.0),
             child: IntrinsicHeight(
                 child: Column(children: [
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset('assets/images/cake.png'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 22),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      selectedProduct.name ?? 'N/A',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.asset('assets/images/cake.png'),
                     ),
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.share),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 22),
-                child: Row(
-                  children: [
-                    Text(
-                      '₹ ${priceToDisplay! * (orderCheckoutController.cartItems[selectedProduct.productId] ?? 0)}',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 18),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 22),
-                child: Row(
-                  children: [
-                    Text(
-                      selectedProduct.details ??
-                          "N/A", // Use the passed product's details
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-              // Continue with the rest of the modal content
-              SizedBox(
-                height: 1.h,
-              ),
-              Container(
-                height: 8.h,
-                decoration: const BoxDecoration(
-                  color: Color(0xffFBEFE3),
-                  borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(20),
-                      topLeft: Radius.circular(20)),
-                ),
-                child: Center(
-                  child: SizedBox(
-                    width: 100.w,
-                    height: 5.h,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.brown.shade50,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(3),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 22),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          selectedProduct.name ?? 'N/A',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Quantity Selector
-                          Container(
-                            height: 4.h,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 2, vertical: 2),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.brown.shade200),
-                              borderRadius: BorderRadius.circular(5),
-                              color: Colors.brown.shade50,
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.share),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 22),
+                    child: Row(
+                      children: [
+                        Text(
+                          '₹ ${priceToDisplay! * (orderCheckoutController.cartItems[selectedProduct.productId] ?? 0)}',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 22),
+                    child: Row(
+                      children: [
+                        Text(
+                          selectedProduct.details ??
+                              "N/A", // Use the passed product's details
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Continue with the rest of the modal content
+                  SizedBox(
+                    height: 1.h,
+                  ),
+                  Container(
+                    height: 8.h,
+                    decoration: const BoxDecoration(
+                      color: Color(0xffFBEFE3),
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(20),
+                          topLeft: Radius.circular(20)),
+                    ),
+                    child: Center(
+                      child: SizedBox(
+                        width: 100.w,
+                        height: 5.h,
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.brown.shade50,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(3),
                             ),
-                            child: Row(
-                              children: [
-                                // Decrease button
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.remove,
-                                    color: Colors.brown,
-                                  ),
-                                  onPressed: () {
-                                    orderCheckoutController
-                                        .decreaseProductQuantity(
-                                            selectedProduct.productId!);
-                                  },
-                                  iconSize: 20,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Quantity Selector
+                              Container(
+                                height: 4.h,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 2, vertical: 2),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.brown.shade200),
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Colors.brown.shade50,
                                 ),
-                                // Quantity text
-                                Obx(() => Text(
+                                child: Row(
+                                  children: [
+                                    // Decrease button
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.remove,
+                                        color: Colors.brown,
+                                      ),
+                                      onPressed: () {
+                                        orderCheckoutController
+                                            .decreaseProductQuantity(
+                                            selectedProduct.productId!);
+                                      },
+                                      iconSize: 20,
+                                    ),
+                                    // Quantity text
+                                    Obx(() => Text(
                                       "${orderCheckoutController.cartItems[selectedProduct.productId] ?? 0}",
                                       style: TextStyle(
                                           fontSize: 16.sp,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.brown),
                                     )),
-                                // Increase button
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.add,
-                                    color: Colors.brown,
-                                  ),
-                                  onPressed: () {
-                                    orderCheckoutController
-                                        .increaseProductQuantity(
+                                    // Increase button
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.add,
+                                        color: Colors.brown,
+                                      ),
+                                      onPressed: () {
+                                        orderCheckoutController
+                                            .increaseProductQuantity(
                                             selectedProduct.productId!);
-                                  },
-                                  iconSize: 20,
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: 2.w),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                // Get.toNamed('/billdetails');
-                                Get.find<PersistentTabController>()
-                                    .jumpToTab(3);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.brown,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                                      },
+                                      iconSize: 20,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
+                              SizedBox(width: 2.w),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    // Get.toNamed('/billdetails');
+                                    Get.find<PersistentTabController>()
+                                        .jumpToTab(3);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.brown,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // Price
-                                  Obx(() => Text(
+                                    children: [
+                                      // Price
+                                      Obx(() => Text(
                                         '₹ ${selectedProduct.basePrice! * (orderCheckoutController.cartItems[selectedProduct.productId] ?? 0)}',
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       )),
-                                  // Text and Icon
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        "View Cart",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      SizedBox(width: 2.w),
-                                      const Icon(
-                                        Icons.shopping_basket_outlined,
-                                        color: Colors.white,
+                                      // Text and Icon
+                                      Row(
+                                        children: [
+                                          const Text(
+                                            "View Cart",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          SizedBox(width: 2.w),
+                                          const Icon(
+                                            Icons.shopping_basket_outlined,
+                                            color: Colors.white,
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              )
-            ])),
+                  )
+                ])),
           ),
           Positioned(
             top: -50,
@@ -986,3 +1049,206 @@ void cartAdd(BuildContext context, AllProductModule selectedProduct) {
     },
   );
 }
+
+
+
+// Widget _buildItemRow(AllProductModule product, bool outOfStock) {
+   // final orderCheckoutController = Get.find<OrderCheckoutController>();
+  //   final productId = product.productId ?? 0;
+  //   final quantity = orderCheckoutController.cartItems[product.productId] ?? 0;
+  //
+  //   final priceToDisplay = product.dealPrice != null ? product.dealPrice : product.basePrice;
+  //
+  //   // Initialize the controller here with the current weight
+  //   TextEditingController _controller = TextEditingController();
+  //
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+  //     child: Column(
+  //       children: [
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 GestureDetector(
+  //                   onTap: () {
+  //                     cartAdd(context, product);
+  //                   },
+  //                   child: Row(
+  //                     children: [
+  //                       Text(
+  //                         product.name ?? "Unnamed Product",
+  //                         style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w500),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //                 Row(
+  //                   children: [
+  //                     Container(
+  //                       decoration: BoxDecoration(
+  //                         borderRadius: const BorderRadius.all(Radius.zero),
+  //                         border: Border.all(color: Colors.green),
+  //                       ),
+  //                       child: const Icon(
+  //                         Icons.circle,
+  //                         size: 15,
+  //                         color: Colors.green,
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 Row(
+  //                   children: [
+  //                     Text(
+  //                       "${product.priceScale == 'Per Item' ? 'Per Item' : 'Per Kg'} ",
+  //                       style: GoogleFonts.inter(
+  //                           color: Colors.grey,
+  //                           fontSize: 14,
+  //                           fontWeight: FontWeight.w300),
+  //                     ),
+  //                     SizedBox(width: 8),
+  //                     Text(
+  //                       "₹${priceToDisplay ?? 0}",
+  //                       style: GoogleFonts.inter(
+  //                           color: Colors.black,
+  //                           fontSize: 14,
+  //                           fontWeight: FontWeight.w300),
+  //                     )
+  //                   ],
+  //                 ),
+  //                 SizedBox(width: 3.w),
+  //               ],
+  //             ),
+  //             if (product.priceScale == 'Per Item')
+  //               Column(
+  //                 children: [
+  //                   Row(
+  //                     children: [
+  //                       Container(
+  //                         width: 120,
+  //                         height: 35,
+  //                         decoration: BoxDecoration(
+  //                           border: Border.all(color: Colors.brown),
+  //                           borderRadius: BorderRadius.circular(8),
+  //                         ),
+  //                         child: Obx(() {
+  //                           final quantity = orderCheckoutController.cartItems[productId] ?? 0;
+  //
+  //                           return Row(
+  //                             children: [
+  //                               IconButton(
+  //                                 icon: const Icon(
+  //                                   Icons.remove,
+  //                                   size: 16,
+  //                                 ),
+  //                                 onPressed: () {
+  //                                   orderCheckoutController.decreaseProductQuantity(productId);
+  //                                 },
+  //                                 color: quantity == 0 ? Colors.grey : Colors.brown,
+  //                               ),
+  //                               Text(
+  //                                 "$quantity",
+  //                                 style: const TextStyle(color: Colors.brown, fontSize: 14),
+  //                               ),
+  //                               IconButton(
+  //                                 icon: const Icon(
+  //                                   Icons.add,
+  //                                   size: 16,
+  //                                 ),
+  //                                 onPressed: () {
+  //                                   orderCheckoutController.increaseProductQuantity(productId);
+  //                                 },
+  //                                 color: outOfStock ? Colors.grey : Colors.brown,
+  //                               ),
+  //                             ],
+  //                           );
+  //                         }),
+  //                       ),
+  //                       SizedBox(width: 2.w),
+  //                       IconButton(
+  //                         icon: const Icon(Icons.cancel, size: 24),
+  //                         onPressed: () {
+  //                           orderCheckoutController.removeAllProducts(productId);
+  //                         },
+  //                         color: Colors.grey,
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   SizedBox(height: 1.h),
+  //                   Text(
+  //                     "₹${(priceToDisplay ?? 0) * quantity}",
+  //                     style: GoogleFonts.alatsi(
+  //                       fontSize: 16,
+  //                       fontWeight: FontWeight.w400,
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             if (product.priceScale == 'Per kg')
+  //               Column(
+  //                 children: [
+  //                   Row(
+  //                     children: [
+  //                       Container(
+  //                         width: 120,
+  //                         height: 35,
+  //                         decoration: BoxDecoration(
+  //                           border: Border.all(color: Colors.brown),
+  //                           borderRadius: BorderRadius.circular(8),
+  //                         ),
+  //                         child: TextField(
+  //                           controller: _controller,
+  //                           keyboardType: TextInputType.numberWithOptions(decimal: true),
+  //
+  //                           onChanged: (value) {
+  //                             // Pass the updated value as a string and update the weight
+  //                             orderCheckoutController.updateWeight(productId, value);
+  //                           },
+  //                           decoration: InputDecoration(
+  //                             hintText: 'Enter',
+  //                             suffixText: 'KG',
+  //                             hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
+  //                             border: InputBorder.none,
+  //                             contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+  //                           ),
+  //                           style: const TextStyle(color: Colors.brown, fontSize: 14),
+  //                         ),
+  //                       ),
+  //                       SizedBox(width: 2.w),
+  //                       IconButton(
+  //                         icon: const Icon(Icons.cancel, size: 24),
+  //                         onPressed: () {
+  //                           orderCheckoutController.updateWeight(productId, '0');
+  //                         },
+  //                         color: Colors.grey,
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   SizedBox(height: 1.h),
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text(
+  //                         "₹${orderCheckoutController.cartPrices[productId] ?? 0.0}",
+  //                         style: GoogleFonts.alatsi(
+  //                           fontSize: 16,
+  //                           fontWeight: FontWeight.w400,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ],
+  //               ),
+  //           ],
+  //         ),
+  //         const Divider(
+  //           color: Colors.grey,
+  //           thickness: 1,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  //}

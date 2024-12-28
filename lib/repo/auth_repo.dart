@@ -35,5 +35,4 @@ class AuthRepository {
       throw Exception('Error: $e');
     }
   }
-
 }

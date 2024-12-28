@@ -44,11 +44,12 @@ class OrderCheckoutController extends GetxController {
 
   final ApiService apiService = Get.find<ApiService>();
 
+
   @override
   void onInit() async{
     super.onInit();
     fetchProducts();
-  await  fetchCafeDetails();
+    await  fetchCafeDetails();
   }
 
   @override
@@ -143,22 +144,22 @@ class OrderCheckoutController extends GetxController {
 
       final DateController dateController = Get.put(DateController());
       CreateCafeOrderModel orderModel = CreateCafeOrderModel(
-        cafeId: int.parse(savedCafeId!),
-        orderDate: dateController.selectedDate.value,
-        routeId: routesId.value,
-        totalAmount: totalPrice.value,
-        orderNumber:
-        orderNumber.value.isNotEmpty ? orderNumber.value : "TEMP_ORDER",
-        paymentStatus: 0,
-        paymentTermId: paymentTermsId.value,
-        products: productOrders,
-        tax: 0,
-        deliveryCharges: 0,
-        deliveryStatus: 0
+          cafeId: int.parse(savedCafeId!),
+          orderDate: dateController.selectedDate.value,
+          routeId: routesId.value,
+          totalAmount: totalPrice.value,
+          orderNumber:
+          orderNumber.value.isNotEmpty ? orderNumber.value : "TEMP_ORDER",
+          paymentStatus: 0,
+          paymentTermId: paymentTermsId.value,
+          products: productOrders,
+          tax: 0,
+          deliveryCharges: 0,
+          deliveryStatus: 0
       );
       print("Ordernum,RouteID");
-print(orderNumber);
-print(routesId);
+      print(orderNumber);
+      print(routesId);
       if (orderModel.cafeId == null || orderModel.orderDate == null) {
         Get.snackbar("Error", "Missing required order information.",
             backgroundColor: Colors.red,
@@ -309,7 +310,6 @@ print(routesId);
     cartItems.clear(); // Clear existing cart items
     totalQuantity.value = 0; // Reset total quantity
     totalPrice.value = 0;
-
     if (order.products == null || order.products!.isEmpty) {
       print('No products to repeat');
       return;
@@ -327,15 +327,13 @@ print(routesId);
       final productDetails = _findProductById(productId);
 
       if (productDetails != null) {
-        final price = productDetails.dealPrice ?? productDetails.basePrice ?? 0.0; // Ensure price is double
+        final price = productDetails.dealPrice ?? productDetails.basePrice ?? 0;
         final subTotalAmount = price * quantity;
 
         print("Cart Items: $cartItems");
-
-        // Ensure quantity is treated as an integer
         cartItems[productId] = quantity.toInt();
-        totalQuantity.value += quantity.toInt(); // Convert quantity to int
-        totalPrice.value += subTotalAmount; // This can remain as double
+        totalQuantity.value += quantity.toInt();
+        totalPrice.value += subTotalAmount;
       } else {
         print("Product with ID $productId not found in product list");
       }
@@ -560,6 +558,7 @@ print(routesId);
     totalPrice.value += price!;
   }
 
+  /*
   void updateWeight(int productId, String value) {
     try {
       // Convert input value to double (allowing decimal points)
@@ -583,7 +582,8 @@ print(routesId);
     } catch (e) {
       print('Error updating weight: $e');
     }
-  }  void _recalculateTotalPrice() {
+  }
+  void _recalculateTotalPrice() {
     double newTotal = 0.0;
 
     cartItems.forEach((productId, quantity) {
@@ -604,10 +604,104 @@ print(routesId);
     final product = allProducts.firstWhere((p) => p.productId == productId);
     final weightInGrams = productWeights[productId] ?? 0.0;
     final pricePerKg = product.dealPrice ?? product.basePrice ?? 0.0;
-    final pricePerGram = pricePerKg / (product.priceScale == 'Per Kg' ? 1000 : 1);
+    final pricePerGram = pricePerKg / (product.priceScale == 'Per Kg' ? 1000 : 0);
     final totalPrice = pricePerGram * weightInGrams;
     return totalPrice;
   }
+*/
+/*
+  void updateWeight(int productId, String value) {
+    try {
+      // Convert input value to double (allowing decimal points)
+      final weightInKg = double.tryParse(value) ?? 0.0;
+      // Convert kg to grams for internal storage
+      final weightInGrams = weightInKg * 1000;
+
+      final product = _findProductById(productId);
+      if (product.priceScale != 'Per kg') return;
+
+      final pricePerKg = (product.dealPrice ?? product.basePrice ?? 0).toDouble();
+      final calculatedPrice = (pricePerKg * weightInKg).toDouble(); // Use weightInKg directly for price calculation
+
+      // Update reactive variables for weight (in grams) and price (in INR)
+      cartWeights[productId] = weightInGrams;
+      cartPrices[productId] = calculatedPrice;
+
+      // Recalculate the total price after updating the weight and price
+      _recalculateTotalPrice();
+
+      update();
+    } catch (e) {
+      print('Error updating weight: $e');
+    }
+  }
+ */
+
+  void updateWeight(int productId, String value) {
+    try {
+      final product = _findProductById(productId);
+
+      // Only update the weight if the price scale is 'Per kg'
+      if (product.priceScale != 'Per kg') return;
+
+      // Convert input value to double (allowing decimal points)
+      final weightInKg = double.tryParse(value) ?? 0.0;
+
+      // Calculate the price based on weight (using kg)
+      final pricePerKg = (product.dealPrice ?? product.basePrice ?? 0).toDouble();
+      final calculatedPrice = pricePerKg * weightInKg;
+
+      // Update the reactive cart variables with weight in kg (no need for gram conversion)
+      cartWeights[productId] = weightInKg;
+      cartPrices[productId] = calculatedPrice;
+
+      // Recalculate the total price (if needed)
+      _recalculateTotalPrice();
+
+      update();  // Refresh UI
+    } catch (e) {
+      print('Error updating weight: $e');
+    }
+  }
+
+
+
+  void _recalculateTotalPrice() {
+    double newTotal = 0.0;
+
+    // Iterate over the cart items and calculate the total price
+    cartItems.forEach((productId, quantity) {
+      final product = _findProductById(productId);
+
+      // Case 1: Price is "Per Item"
+      if (product.priceScale == 'Per Item') {
+        final price = product.dealPrice ?? product.basePrice ?? 0.0;
+        newTotal += price * quantity;
+      }
+      // Case 2: Price is "Per kg"
+      else if (product.priceScale == 'Per kg') {
+        // For Per kg, we use the weight and calculated price (stored in cartPrices)
+        newTotal += cartPrices[productId] ?? 0.0;
+      }
+    });
+
+    // Update the total price
+    totalPrice.value = newTotal;
+  }
+
+  double updateTotalPrice(int productId) {
+    final product = allProducts.firstWhere((p) => p.productId == productId);
+    final weightInGrams = cartWeights[productId] ?? 0.0;  // Get weight in grams from cartWeights
+    final pricePerKg = product.dealPrice ?? product.basePrice ?? 0.0;
+
+    // Convert price per kg to price per gram (if applicable)
+    final pricePerGram = pricePerKg / 1000;
+
+    // Calculate the total price based on the weight in grams
+    final totalPrice = pricePerGram * weightInGrams;
+    return totalPrice;
+  }
+
 
   List<AllProductModule> get selectedProducts {
     return [...restProducts, ...dealProducts]
@@ -615,12 +709,12 @@ print(routesId);
         .toList();
   }
   String getDisplayWeight(int productId) {
-    final weightInGrams = cartWeights[productId] ?? 0.0;
+    final weightInGrams = cartWeights[productId] ?? .0;//0.0;
     final weightInKg = weightInGrams / 1000;
     return weightInKg.toStringAsFixed(3); // Show up to 3 decimal places for kg
   }
   double getPriceToDisplay(int productId) {
-    return cartPrices[productId] ?? 0.0;
+    return cartPrices[productId] ?? .0;
   }
   void navigateToBillDetails() {
     if (cartItems.isNotEmpty) {

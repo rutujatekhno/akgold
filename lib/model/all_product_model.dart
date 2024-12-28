@@ -11,6 +11,7 @@ class AllProductModule {
   int? productId;
   int? proMastId;
   String? productMasterName;
+  String? imagePath; // Added imagePath
   String? name;
   String? details;
   int? productWeight;
@@ -29,6 +30,7 @@ class AllProductModule {
     this.productId,
     this.proMastId,
     this.productMasterName,
+    this.imagePath,
     this.name,
     this.details,
     this.productWeight,
@@ -49,6 +51,7 @@ class AllProductModule {
     productId = json['product_id'];
     proMastId = json['pro_mast_id'];
     productMasterName = json['Product_Master_Name'];
+    imagePath = json['imagePath']; // Added imagePath
     name = json['name'];
     details = json['details'];
     productWeight = json['product_weight'];
@@ -80,6 +83,7 @@ class AllProductModule {
     data['product_id'] = productId;
     data['pro_mast_id'] = proMastId;
     data['Product_Master_Name'] = productMasterName;
+    data['imagePath'] = imagePath; // Added imagePath
     data['name'] = name;
     data['details'] = details;
     data['product_weight'] = productWeight;
@@ -101,6 +105,7 @@ class DealProducts {
   int? productId;
   int? proMastId;
   String? productMasterName;
+  String? imagePath; // Added imagePath
   String? name;
   String? details;
   int? productWeight;
@@ -116,6 +121,7 @@ class DealProducts {
     this.productId,
     this.proMastId,
     this.productMasterName,
+    this.imagePath, // Added imagePath
     this.name,
     this.details,
     this.productWeight,
@@ -132,6 +138,7 @@ class DealProducts {
     productId = json['product_id'];
     proMastId = json['pro_mast_id'];
     productMasterName = json['Product_Master_Name'];
+    imagePath = json['imagePath']; // Added imagePath
     name = json['name'];
     details = json['details'];
     productWeight = json['product_weight'];
@@ -149,6 +156,7 @@ class DealProducts {
     data['product_id'] = productId;
     data['pro_mast_id'] = proMastId;
     data['Product_Master_Name'] = productMasterName;
+    data['imagePath'] = imagePath; // Added imagePath
     data['name'] = name;
     data['details'] = details;
     data['product_weight'] = productWeight;
@@ -168,6 +176,7 @@ class DealProducts {
       productId: this.productId,
       proMastId: this.proMastId,
       productMasterName: this.productMasterName,
+      imagePath: this.imagePath, // Added imagePath
       name: this.name,
       details: this.details,
       productWeight: this.productWeight,
@@ -186,6 +195,7 @@ class RestProducts {
   int? productId;
   int? proMastId;
   String? productMasterName;
+  String? imagePath; // Added imagePath
   String? name;
   String? details;
   int? productWeight;
@@ -196,10 +206,12 @@ class RestProducts {
   int? makingPrice;
   String? priceScale;
 
+
   RestProducts({
     this.productId,
     this.proMastId,
     this.productMasterName,
+    this.imagePath, // Added imagePath
     this.name,
     this.details,
     this.productWeight,
@@ -215,6 +227,7 @@ class RestProducts {
     productId = json['product_id'];
     proMastId = json['pro_mast_id'];
     productMasterName = json['Product_Master_Name'];
+    imagePath = json['imagePath']; // Added imagePath
     name = json['name'];
     details = json['details'];
     productWeight = json['product_weight'];
@@ -231,6 +244,7 @@ class RestProducts {
     data['product_id'] = productId;
     data['pro_mast_id'] = proMastId;
     data['Product_Master_Name'] = productMasterName;
+    data['imagePath'] = imagePath; // Added imagePath
     data['name'] = name;
     data['details'] = details;
     data['product_weight'] = productWeight;

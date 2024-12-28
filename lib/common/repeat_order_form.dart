@@ -254,63 +254,124 @@ class RepeatOrder extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          ...order.products!.asMap().entries.map(
-                                (entry) {
-                              int index = entry.key;
-                              var product = entry.value;
+                          // Per Item products
+                          ...order.products!
+                              .where((product) => product.priceScale == 'Per Item')
+                              .toList()
+                              .asMap()
+                              .entries
+                              .map((entry) {
+                            int index = entry.key;
+                            var product = entry.value;
 
-                              return GestureDetector(
-                                onTap: () {
-                                  selectedIndex.value =
-                                  (selectedIndex.value == index)
-                                      ? null
-                                      : index;
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: selected == index
-                                        ? const Color(0xffF5E1C0)
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 6.0, horizontal: 8.0),
-                                  margin:
-                                  const EdgeInsets.symmetric(vertical: 2.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "${product.name} [${product.quantity ?? 0} Piece]",
-                                            style: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 13,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      // Price
-                                      Text(
-                                        "₹ ${product.subTotalAmount}",
-                                        style: GoogleFonts.inter(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 13,
-                                          color: const Color(0xff7B3F00),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                            return GestureDetector(
+                              onTap: () {
+                                selectedIndex.value =
+                                (selectedIndex.value == index) ? null : index;
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: selected == index
+                                      ? const Color(0xffF5E1C0)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
-                              );
-                            },
-                          ),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 6.0, horizontal: 8.0),
+                                margin: const EdgeInsets.symmetric(vertical: 2.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${product.name} [${product.quantity ?? 0} Piece]",
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 13,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // Price
+                                    Text(
+                                      "₹ ${product.subTotalAmount}",
+                                      style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                        color: const Color(0xff7B3F00),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }),
+
+                          // Per kg products
+                          ...order.products!
+                              .where((product) => product.priceScale == 'Per kg')
+                              .toList()
+                              .asMap()
+                              .entries
+                              .map((entry) {
+                            int index = entry.key;
+                            var product = entry.value;
+
+                            return GestureDetector(
+                              onTap: () {
+                                selectedIndex.value =
+                                (selectedIndex.value == index) ? null : index;
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: selected == index
+                                      ? const Color(0xffF5E1C0)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 6.0, horizontal: 8.0),
+                                margin: const EdgeInsets.symmetric(vertical: 2.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${product.name} [${product.quantity ?? 0} KG]",
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 13,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // Price
+                                    Text(
+                                      "₹ ${product.subTotalAmount}",
+                                      style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                        color: const Color(0xff7B3F00),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }),
+
                           const Padding(
                             padding: EdgeInsets.symmetric(vertical: 4.0),
                             child: Divider(
@@ -350,5 +411,4 @@ class RepeatOrder extends StatelessWidget {
         );
       },
     );
-  }
-}
+  }}
